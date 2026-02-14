@@ -61,7 +61,157 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/admin', adminRoutes);
 
 app.get('/', (req, res) => {
-    res.send('IARE MUN Backend is running in production mode!');
+    res.send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>IARE MUN API | System Status</title>
+            <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+            <style>
+                :root {
+                    --primary: #6366f1;
+                    --secondary: #a855f7;
+                    --bg: #0f172a;
+                    --card-bg: rgba(30, 41, 59, 0.7);
+                    --text: #f8fafc;
+                    --success: #22c55e;
+                }
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body {
+                    font-family: 'Outfit', sans-serif;
+                    background-color: var(--bg);
+                    background-image: 
+                        radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 40%);
+                    color: var(--text);
+                    height: 100vh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    overflow: hidden;
+                }
+                .container {
+                    background: var(--card-bg);
+                    backdrop-filter: blur(12px);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    padding: 3rem;
+                    border-radius: 24px;
+                    text-align: center;
+                    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+                    max-width: 500px;
+                    width: 90%;
+                    animation: fadeIn 0.8s ease-out;
+                }
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                h1 {
+                    font-size: 2.5rem;
+                    font-weight: 600;
+                    margin-bottom: 1rem;
+                    background: linear-gradient(to right, var(--primary), var(--secondary));
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                }
+                .status-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    background: rgba(34, 197, 94, 0.1);
+                    color: var(--success);
+                    padding: 0.5rem 1.25rem;
+                    border-radius: 9999px;
+                    font-weight: 600;
+                    font-size: 0.9rem;
+                    margin-bottom: 2rem;
+                    border: 1px solid rgba(34, 197, 94, 0.2);
+                }
+                .pulse {
+                    width: 8px;
+                    height: 8px;
+                    background: var(--success);
+                    border-radius: 50%;
+                    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+                    animation: pulse 2s infinite;
+                }
+                @keyframes pulse {
+                    0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+                    70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+                    100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+                }
+                p {
+                    color: #94a3b8;
+                    line-height: 1.6;
+                    margin-bottom: 2rem;
+                }
+                .info-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 1rem;
+                    margin-top: 2rem;
+                }
+                .info-item {
+                    background: rgba(255, 255, 255, 0.03);
+                    padding: 1rem;
+                    border-radius: 12px;
+                    border: 1px solid rgba(255, 255, 255, 0.05);
+                }
+                .info-label {
+                    font-size: 0.75rem;
+                    color: #64748b;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    margin-bottom: 0.25rem;
+                }
+                .info-value {
+                    font-weight: 600;
+                    color: var(--text);
+                }
+                .footer {
+                    margin-top: 3rem;
+                    font-size: 0.8rem;
+                    color: #475569;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="status-badge">
+                    <div class="pulse"></div>
+                    System Operational
+                </div>
+                <h1>IARE MUN API</h1>
+                <p>The backend core is running smoothly and ready to process registrations and payments.</p>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Environment</div>
+                        <div class="info-value">Production</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Version</div>
+                        <div class="info-value">1.0.4</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Uptime</div>
+                        <div class="info-value">${Math.floor(process.uptime() / 60)}m ${Math.floor(process.uptime() % 60)}s</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Port</div>
+                        <div class="info-value">${process.env.PORT || 5000}</div>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    &copy; 2026 IARE MUN Tech Team • Protected by Firebase
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
 });
 
 // Health check endpoint
