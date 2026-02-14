@@ -32,8 +32,11 @@ app.use('/api/', limiter);
 const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:8080',
-    'https://productionbackend-she7.onrender.com',
-    'https://munproduction.vercel.app', // Anticipated Vercel URL
+    'http://localhost:8081',
+    'http://localhost:8082',
+    'https://productionbackend-3sr4.onrender.com',
+    'https://productionbackend-o3tk.onrender.com',
+    'https://munproduction.vercel.app',
 ];
 
 app.use(cors({

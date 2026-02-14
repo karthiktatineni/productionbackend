@@ -2,8 +2,23 @@
 import { db } from "../config/firebase.js";
 import { collection, getDocs, doc, updateDoc, setDoc } from "firebase/firestore";
 
+// Simple in-memory cache to reduce DB load
+let cache = {
+    adminData: null,
+    lastFetched: 0
+};
+
+const CACHE_TTL = 30000; // 30 seconds cache for admin data
+
 export const getAdminData = async (req, res) => {
     try {
+        const now = Date.now();
+        if (cache.adminData && (now - cache.lastFetched < CACHE_TTL)) {
+            console.log("Serving admin data from cache");
+            return res.json(cache.adminData);
+        }
+
+        console.log("Fetching admin data from Firestore");
         const querySnapshot = await getDocs(collection(db, "registrations"));
         const delegateList = [];
 
@@ -90,16 +105,28 @@ export const getAdminData = async (req, res) => {
         });
         ocList.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
-        res.json({
+        const responseData = {
             success: true,
             delegates: delegateList,
             ocMembers: ocList
-        });
+        };
+
+        // Update cache
+        cache.adminData = responseData;
+        cache.lastFetched = now;
+
+        res.json(responseData);
 
     } catch (error) {
         console.error("Error fetching admin data:", error);
         res.status(500).json({ error: error.message || "Internal server error" });
     }
+};
+
+// Helper function to clear cache when data is updated
+const clearCache = () => {
+    cache.adminData = null;
+    cache.lastFetched = 0;
 };
 
 export const allocateDelegate = async (req, res) => {
@@ -123,6 +150,7 @@ export const allocateDelegate = async (req, res) => {
             });
         }
 
+        clearCache();
         res.json({ success: true });
     } catch (error) {
         console.error("Error allocating:", error);
@@ -151,6 +179,7 @@ export const deallocateDelegate = async (req, res) => {
             });
         }
 
+        clearCache();
         res.json({ success: true });
     } catch (error) {
         console.error("Error deallocating:", error);
@@ -168,6 +197,7 @@ export const verifyPayment = async (req, res) => {
             verified: true
         });
 
+        clearCache();
         res.json({ success: true });
     } catch (error) {
         console.error("Error verifying:", error);
